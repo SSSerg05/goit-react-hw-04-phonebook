@@ -1,5 +1,5 @@
 // library
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { nanoid } from "nanoid";
 
 // components
@@ -15,105 +15,234 @@ import contactsInitial from "../../data/contactsInitial.json";
 import { DeskPhonebook } from "./Phonebook.styled";
 
 
-export class Phonebook extends Component {
 
-  state = {
-    contacts: [],
-    filter: '',
-  }
+export const Phonebook = () => {
+  
+  // create new Id
+  const createId = () => { return nanoid(); }
 
-  createId = () => { return nanoid(); }
+  // hook -> contacts 
+  const [contacts, setContacts] = useState([]);
 
-  onSubmitForm = (contact) => {
+  // hook -> filter
+  const [filter, setFilter] = useState('');
 
-    if (this.isFound(contact.name)) { 
+  // Click onSubmitForm
+  const onSubmitForm = (contact) => {
+    if (isFound(contact.name)) {
       alert(`${contact.name} - find in numberbook base`);
       return;
     }
 
-    const newContact = { id: this.createId(), ...contact };
-    this.setState(({ contacts }) => ({
-      contacts: [newContact, ...contacts],
-    }))
+    const newContact = { id: createId(), ...contact };
+    setContacts( [newContact, ...contacts] )
   }
 
-  isFound = (name) => {
-    const { contacts } = this.state;
+  // isFound
+  const isFound = (name) => {
     const findName = name.trim().toLowerCase();
 
     return contacts.some(item => item.name.toLowerCase() === findName)
   }
 
   // Filter
-  onChangeFilter = e => { 
-    this.setState({ filter: e.currentTarget.value });
+  const onChangeFilter = e => {
+    setFilter( e.currentTarget.value );
   }
 
-  getVisibleContacts = () => { 
-    const { contacts, filter } = this.state;
+
+  const getVisibleContacts = () => {
     const nomaliseFilter = filter.toLowerCase();
 
     return contacts.filter(
       item => item.name.toLowerCase().includes(nomaliseFilter));
   }
 
+
   // delete item without ContactsList
-  onDeleteItem = (id) => { 
-    this.setState(({ contacts }) => ({
+  const onDeleteItem = (id) => {
+    setContacts(({ contacts }) => ({
       contacts: contacts.filter(item => item.id !== id),
     }))
   }
 
-  componentDidMount() { 
+
+  //useEffect -> function, dataArray
+  //   componentDidMount -> function, [beginDataValue]
+  //   componentWillUnmount -> return (function)  
+  useEffect(() => {
     try {
       const list = localStorage.getItem('contacts');
       const contacts = JSON.parse(list);
-    console.log(contacts);
+    
       if (contacts) {
-        this.setState({ contacts });
+        setContacts(contacts);
       } else {
-        this.setState({ contacts: contactsInitial });
+        setContacts(contactsInitial);
       }
 
     } catch (error) {
-      console.log('Cann`t load data without LocalStorage'); 
+      console.log('Cann`t load data without LocalStorage');
     }
-  }
+  }, []);
 
-  componentDidUpdate(preProp, preState) { 
-    const { contacts } = this.state
 
-    if (preState.contacts !== contacts) {
-      localStorage.setItem('contacts', JSON.stringify(contacts));
-    }
-  }
 
-  render() {
-    const { filter } = this.state;
-    const outFilter = this.getVisibleContacts();
-
-    return (
-      <DeskPhonebook>
-        <Section title={"Phonebook"}>
-          <Form
-           onSubmit={this.onSubmitForm}
-          />
-        </Section>
+  const outFilter = getVisibleContacts();
+  return (
+    <DeskPhonebook>
+      <Section title={"Phonebook"}>
+        <Form
+          onSubmit={onSubmitForm}
+        />
+      </Section>
         
-        <Section>
-          <Filter
-            value = { filter }
-            onFilter={this.onChangeFilter}
-          />
-        </Section>
+      <Section>
+        <Filter
+          value={filter}
+          onFilter={onChangeFilter}
+        />
+      </Section>
       
-        <Section title={"Contacts"}>
-          <ContactsList
-            contacts={ outFilter }
-            onDelete={this.onDeleteItem}
-          />
-        </Section>
-      </DeskPhonebook>
-    );
-  }
+      <Section title={"Contacts"}>
+        <ContactsList
+          contacts={outFilter}
+          onDelete={onDeleteItem}
+        />
+      </Section>
+    </DeskPhonebook>
+  )
 }
+
+
+  
+  // componentDidMount() { 
+  //   try {
+  //     const list = localStorage.getItem('contacts');
+  //     const contacts = JSON.parse(list);
+  //   console.log(contacts);
+  //     if (contacts) {
+  //       this.setState({ contacts });
+  //     } else {
+  //       this.setState({ contacts: contactsInitial });
+  //     }
+
+  //   } catch (error) {
+  //     console.log('Cann`t load data without LocalStorage'); 
+  //   }
+  // }
+
+  // componentDidUpdate(preProp, preState) { 
+  //   const { contacts } = this.state
+
+  //   if (preState.contacts !== contacts) {
+  //     localStorage.setItem('contacts', JSON.stringify(contacts));
+  //   }
+  // }
+
+  
+  
+  
+
+// export class Phonebook extends Component {
+
+//   state = {
+//     contacts: [],
+//     filter: '',
+//   }
+
+//   createId = () => { return nanoid(); }
+
+//   onSubmitForm = (contact) => {
+
+//     if (this.isFound(contact.name)) { 
+//       alert(`${contact.name} - find in numberbook base`);
+//       return;
+//     }
+
+//     const newContact = { id: this.createId(), ...contact };
+//     this.setState(({ contacts }) => ({
+//       contacts: [newContact, ...contacts],
+//     }))
+//   }
+
+//   isFound = (name) => {
+//     const { contacts } = this.state;
+//     const findName = name.trim().toLowerCase();
+
+//     return contacts.some(item => item.name.toLowerCase() === findName)
+//   }
+
+//   // Filter
+//   onChangeFilter = e => { 
+//     this.setState({ filter: e.currentTarget.value });
+//   }
+
+//   getVisibleContacts = () => { 
+//     const { contacts, filter } = this.state;
+//     const nomaliseFilter = filter.toLowerCase();
+
+//     return contacts.filter(
+//       item => item.name.toLowerCase().includes(nomaliseFilter));
+//   }
+
+//   // delete item without ContactsList
+//   onDeleteItem = (id) => { 
+//     this.setState(({ contacts }) => ({
+//       contacts: contacts.filter(item => item.id !== id),
+//     }))
+//   }
+
+//   componentDidMount() { 
+//     try {
+//       const list = localStorage.getItem('contacts');
+//       const contacts = JSON.parse(list);
+//     console.log(contacts);
+//       if (contacts) {
+//         this.setState({ contacts });
+//       } else {
+//         this.setState({ contacts: contactsInitial });
+//       }
+
+//     } catch (error) {
+//       console.log('Cann`t load data without LocalStorage'); 
+//     }
+//   }
+
+//   componentDidUpdate(preProp, preState) { 
+//     const { contacts } = this.state
+
+//     if (preState.contacts !== contacts) {
+//       localStorage.setItem('contacts', JSON.stringify(contacts));
+//     }
+//   }
+
+//   render() {
+//     const { filter } = this.state;
+//     const outFilter = this.getVisibleContacts();
+
+//     return (
+//       <DeskPhonebook>
+//         <Section title={"Phonebook"}>
+//           <Form
+//            onSubmit={this.onSubmitForm}
+//           />
+//         </Section>
+        
+//         <Section>
+//           <Filter
+//             value = { filter }
+//             onFilter={this.onChangeFilter}
+//           />
+//         </Section>
+      
+//         <Section title={"Contacts"}>
+//           <ContactsList
+//             contacts={ outFilter }
+//             onDelete={this.onDeleteItem}
+//           />
+//         </Section>
+//       </DeskPhonebook>
+//     );
+//   }
+// }
