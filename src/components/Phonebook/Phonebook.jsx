@@ -61,15 +61,14 @@ export const Phonebook = () => {
 
   // delete item without ContactsList
   const onDeleteItem = (id) => {
-    setContacts(({ contacts }) => ({
-      contacts: contacts.filter(item => item.id !== id),
-    }))
+    setContacts(( contacts.filter(item => item.id !== id) ))
   }
 
 
   //useEffect -> function, dataArray
-  //   componentDidMount -> function, [beginDataValue]
+  //   componentDidMount -> function, []
   //   componentWillUnmount -> return (function)  
+  //   componentDidUpdate -> function, [monitoring state value]
   useEffect(() => {
     try {
       const list = localStorage.getItem('contacts');
@@ -86,6 +85,13 @@ export const Phonebook = () => {
     }
   }, []);
 
+  //   componentDidUpdate -> function, [monitoring state value]
+  useEffect((preProp, preState) => {
+    console.log(preState);
+    if (preState !== contacts) {
+      localStorage.setItem('contacts', JSON.stringify(contacts));
+    }
+  }, [contacts]);
 
 
   const outFilter = getVisibleContacts();
@@ -115,34 +121,6 @@ export const Phonebook = () => {
 }
 
 
-  
-  // componentDidMount() { 
-  //   try {
-  //     const list = localStorage.getItem('contacts');
-  //     const contacts = JSON.parse(list);
-  //   console.log(contacts);
-  //     if (contacts) {
-  //       this.setState({ contacts });
-  //     } else {
-  //       this.setState({ contacts: contactsInitial });
-  //     }
-
-  //   } catch (error) {
-  //     console.log('Cann`t load data without LocalStorage'); 
-  //   }
-  // }
-
-  // componentDidUpdate(preProp, preState) { 
-  //   const { contacts } = this.state
-
-  //   if (preState.contacts !== contacts) {
-  //     localStorage.setItem('contacts', JSON.stringify(contacts));
-  //   }
-  // }
-
-  
-  
-  
 
 // export class Phonebook extends Component {
 
