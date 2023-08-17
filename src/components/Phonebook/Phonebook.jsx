@@ -9,7 +9,7 @@ import { Filter } from "./Filter/Filter";
 import { Form } from "./Form/Form";
 
 // data
-import contactsInitial from "../../data/contactsInitial.json";
+import initialContacts from "../../data/contactsInitial.json";
 
 // style
 import { DeskPhonebook } from "./Phonebook.styled";
@@ -72,12 +72,12 @@ export const Phonebook = () => {
   useEffect(() => {
     try {
       const list = localStorage.getItem('contacts');
-      const contacts = JSON.parse(list);
-    
-      if (contacts) {
-        setContacts(contacts);
+      const savedContacts = JSON.parse(list);
+
+      if (savedContacts.length) {
+        setContacts(savedContacts);
       } else {
-        setContacts(contactsInitial);
+        setContacts(initialContacts);
       }
 
     } catch (error) {
@@ -86,9 +86,9 @@ export const Phonebook = () => {
   }, []);
 
   //   componentDidUpdate -> function, [monitoring state value]
-  useEffect((preProp, preState) => {
-    console.log(preState);
-    if (preState !== contacts) {
+  // перевірка з попереднім значенням робиться автоматично
+  useEffect(() => {
+    if (contacts.length) {
       localStorage.setItem('contacts', JSON.stringify(contacts));
     }
   }, [contacts]);
