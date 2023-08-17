@@ -74,7 +74,7 @@ export const Phonebook = () => {
       const list = localStorage.getItem('contacts');
       const savedContacts = JSON.parse(list);
 
-      if (savedContacts.length) {
+      if (savedContacts) {
         setContacts(savedContacts);
       } else {
         setContacts(initialContacts);
