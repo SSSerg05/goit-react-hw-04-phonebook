@@ -15,17 +15,41 @@ import initialContacts from "../../data/contactsInitial.json";
 import { DeskPhonebook } from "./Phonebook.styled";
 
 
-
 export const Phonebook = () => {
   
   // create new Id
   const createId = () => { return nanoid(); }
 
-  // hook -> contacts 
-  const [contacts, setContacts] = useState([]);
-
-  // hook -> filter
+  // state -> contacts 
+  const [contacts, setContacts] = useState(initialContacts);
   const [filter, setFilter] = useState('');
+
+
+//useEffect -> function, dataArray
+  //   componentDidMount -> function, []
+  //   componentWillUnmount -> return (function)  
+  //   componentDidUpdate -> function, [monitoring state value]
+  useEffect(() => {
+    try {
+      const list = localStorage.getItem('contacts');
+      const savedContacts = JSON.parse(list);
+      console.log("didMount",savedContacts, savedContacts.length);
+
+      setContacts((savedContacts && savedContacts.length) ? savedContacts: initialContacts);
+
+    } catch (error) {
+      console.log('Cann`t load data without LocalStorage');
+    }
+  }, []);
+
+  //   componentDidUpdate -> function, [monitoring state value]
+  // перевірка з попереднім значенням робиться автоматично
+  useEffect(() => {
+    console.log("didUpdate");
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+    
+  }, [contacts]);
+
 
   // Click onSubmitForm
   const onSubmitForm = (contact) => {
@@ -35,7 +59,7 @@ export const Phonebook = () => {
     }
 
     const newContact = { id: createId(), ...contact };
-    setContacts( [newContact, ...contacts] )
+    setContacts((prev) => [newContact, ...prev] )
   }
 
   // isFound
@@ -61,37 +85,8 @@ export const Phonebook = () => {
 
   // delete item without ContactsList
   const onDeleteItem = (id) => {
-    setContacts(( contacts.filter(item => item.id !== id) ))
+    setContacts((prev) => prev.filter(item => item.id !== id) )
   }
-
-
-  //useEffect -> function, dataArray
-  //   componentDidMount -> function, []
-  //   componentWillUnmount -> return (function)  
-  //   componentDidUpdate -> function, [monitoring state value]
-  useEffect(() => {
-    try {
-      const list = localStorage.getItem('contacts');
-      const savedContacts = JSON.parse(list);
-
-      if (savedContacts) {
-        setContacts(savedContacts);
-      } else {
-        setContacts(initialContacts);
-      }
-
-    } catch (error) {
-      console.log('Cann`t load data without LocalStorage');
-    }
-  }, []);
-
-  //   componentDidUpdate -> function, [monitoring state value]
-  // перевірка з попереднім значенням робиться автоматично
-  useEffect(() => {
-    if (contacts.length) {
-      localStorage.setItem('contacts', JSON.stringify(contacts));
-    }
-  }, [contacts]);
 
 
   const outFilter = getVisibleContacts();
