@@ -15,39 +15,35 @@ import initialContacts from "../../data/contactsInitial.json";
 import { DeskPhonebook } from "./Phonebook.styled";
 
 
+
+
 export const Phonebook = () => {
   
-  // create new Id
-  const createId = () => { return nanoid(); }
-
-  // state -> contacts 
-  const [contacts, setContacts] = useState(initialContacts);
-  const [filter, setFilter] = useState('');
-
-
-//useEffect -> function, dataArray
-  //   componentDidMount -> function, []
-  //   componentWillUnmount -> return (function)  
-  //   componentDidUpdate -> function, [monitoring state value]
-  useEffect(() => {
+  // load data with LS or preInitial
+  const loadData = () => { 
     try {
       const list = localStorage.getItem('contacts');
       const savedContacts = JSON.parse(list);
-      console.log("didMount",savedContacts, savedContacts.length);
 
-      setContacts((savedContacts && savedContacts.length) ? savedContacts: initialContacts);
+      return savedContacts ?? initialContacts;
 
     } catch (error) {
       console.log('Cann`t load data without LocalStorage');
+      return [];
     }
-  }, []);
+  }
+
+  // create new Id
+  const createId = () => { return nanoid(); }
+
+  // state 
+  const [contacts, setContacts] = useState(loadData());
+  const [filter, setFilter] = useState('');
+
 
   //   componentDidUpdate -> function, [monitoring state value]
-  // перевірка з попереднім значенням робиться автоматично
   useEffect(() => {
-    console.log("didUpdate");
     localStorage.setItem('contacts', JSON.stringify(contacts));
-    
   }, [contacts]);
 
 
